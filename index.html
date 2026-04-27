@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>くにこばあちゃんの龍神カード</title>
+
+<style>
+body{font-family:"Hiragino Sans","Yu Gothic",sans-serif;background:#fffaf3;margin:0;padding:0;color:#444}
+.wrap{max-width:900px;margin:auto;padding:20px}
+h1{text-align:center;color:#6b4e16}
+
+.cards{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+gap:10px;
+margin-top:20px;
+}
+
+.card{
+border:2px solid #e6d5b8;
+border-radius:15px;
+padding:10px;
+text-align:center;
+background:#fff;
+cursor:pointer;
+}
+
+.card.selected{
+background:#fff3cc;
+border-color:#c9a23a;
+}
+
+.card img{
+width:100%;
+border-radius:10px;
+margin-bottom:5px;
+}
+
+button{
+padding:12px 20px;
+border:none;
+border-radius:20px;
+margin-top:15px;
+background:#b8860b;
+color:white;
+font-size:16px;
+}
+
+.result{
+margin-top:20px;
+padding:15px;
+background:#fff;
+border-radius:15px;
+border:1px solid #eee;
+white-space:pre-line;
+}
+
+.today{
+margin-top:10px;
+padding:10px;
+background:#f4ecff;
+border-left:5px solid #a98cff;
+}
+
+.linkbtn{
+display:block;
+text-align:center;
+margin-top:15px;
+padding:12px;
+background:#ffcc66;
+border-radius:20px;
+text-decoration:none;
+color:#333;
+font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+<h1>くにこばあちゃんの龍神カード</h1>
+<p style="text-align:center">気になるカードを1枚えらんでください</p>
+
+<div class="cards" id="cards"></div>
+
+<div style="text-align:center">
+<button onclick="readCard()">鑑定する</button>
+</div>
+
+<div class="result">
+<div id="result">ここに結果がでます</div>
+<div class="today" id="today"></div>
+</div>
+
+<a class="linkbtn" href="https://note.com/kuniko345">続きはnoteで読む</a>
+<a class="linkbtn" href="https://coconala.com/services/4181052">個別鑑定(ココナラ)はこちら</a>
+
+</div>
+
+<script>
+
+// ★ここが重要：画像ファイル名
+
+
+const cards=[
+{id:1,name:"金龍",img:"dragon1.jpg",meaning:"大きな流れがあなたに来ています。無理をしなくても、自然と良い方向へ進んでいきます。"},
+{id:2,name:"銀龍",img:"dragon2.jpg",meaning:"心を整える時です。静かな時間の中に答えがあります。"},
+{id:3,name:"青龍",img:"dragon3.jpg",meaning:"小さな一歩が未来を開きます。焦らなくて大丈夫です。"},
+{id:4,name:"紅龍",img:"dragon4.jpg",meaning:"今は少しだけ動く時。やってみることで流れが変わります。"},
+{id:5,name:"白龍",img:"dragon5.jpg",meaning:"リセットの時です。安心できる方向を選びましょう。"}
+];
+
+
+
+
+
+const morningWords = [
+"おはよう。今日は“がんばらない”が流れに乗るコツです。",
+"動かなくてもいい朝も、ちゃんと意味があります。",
+"今日の正解は、あとからわかりますよ。",
+"うまくいかないことも、流れの中です。",
+"遠回りに見える道が、いちばん近いこともあります。",
+"やる気が出ない日は、整っている途中です。",
+"今日は“少しだけやる”で十分です。",
+"迷っている時点で、もう進んでいます。",
+"答えを探さなくても、ちゃんと来ます。",
+"朝から元気じゃなくても、大丈夫です。",
+
+"“これでいいのかな”が出たら、だいたい合っています。",
+"うまくやろうとしない方が、うまくいきます。",
+"止まることも、流れのひとつです。",
+"今日の違和感は、大事なサインです。",
+"がんばる方向、少しだけズレていませんか？",
+"ゆっくりの方が、結果は早いこともあります。",
+"やめる勇気も、流れを変えます。",
+"今は“整える日”かもしれません。",
+"思い通りじゃない方が、うまくいくこともあります。",
+"少し手放すと、流れが動きます。",
+
+"今日のヒントは、“いつもと違う選択”です。",
+"直感は、小さく来ます。見逃さないでくださいね。",
+"いい流れは、静かに始まります。",
+"朝の違和感、大事にしてください。",
+"動く前に、ひと呼吸してみましょう。",
+"“今じゃない”も、大切なタイミングです。",
+"人に合わせすぎていませんか？",
+"今日は“やらないこと”を決めると整います。",
+"うまくいく前は、少しだけズレます。",
+"焦るときほど、止まるのが近道です。",
+
+"今日の鍵は、“力を抜くこと”です。",
+"正しさより、心地よさを選んでください。",
+"考えすぎると、流れが見えなくなります。",
+"あなたのペースが、いちばん合っています。",
+"違うと感じたら、そっと方向を変えて大丈夫です。",
+"今日は“少しだけ軽く”がテーマです。",
+"完璧じゃない方が、流れに乗れます。",
+"朝の気分が、そのままヒントです。",
+"今日は“無理しない”が正解です。",
+"安心して、ゆるめてください。",
+
+"動かなくても、流れは来ています。",
+"大きな変化は、小さな違和感から始まります。",
+"今日のあなたに必要なのは、“ひとつだけ”です。",
+"うまくいかない理由ではなく、楽な方を選びましょう。",
+"今のままでも、ちゃんと流れに乗っています。",
+"考えない時間が、流れを呼びます。",
+"今日は“軽さ”を意識してみてください。",
+"ゆっくりの中に、チャンスがあります。",
+"何もしない時間も、ちゃんと進んでいます。",
+"いってらっしゃい。今日は“力を抜く日”です。"
+];
+
+
+
+
+
+let selected=null;
+
+function render(){
+const el=document.getElementById("cards");
+el.innerHTML="";
+
+cards.forEach(c=>{
+const d=document.createElement("div");
+d.className="card";
+
+d.innerHTML=`
+<img src="${c.img}">
+<b>${c.name}</b>
+`;
+
+d.onclick=()=>{
+selected=c;
+[...el.children].forEach(x=>x.classList.remove("selected"));
+d.classList.add("selected");
+};
+
+el.appendChild(d);
+});
+}
+
+function readCard(){
+if(!selected){alert("カードを選んでください");return;}
+
+document.getElementById("result").innerText=
+`選ばれたのは「${selected.name}」です。
+
+${selected.meaning}
+
+今日はがんばりすぎなくて大丈夫。
+ゆっくり整えることで、流れはよくなります。
+
+あなたはちゃんと大丈夫ですよ。`;
+
+
+document.getElementById("today").innerText=
+"今日のひとこと："+morningWords[Math.floor(Math.random()*morningWords.length)];
+
+}
+
+render();
+</script>
+
+</body>
+</html>
